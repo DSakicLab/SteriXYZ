@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <title>SteriXYZ web</title>
+  <meta charset="UTF-8" />
+  <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    </head>
+
+<style>
+
+.flex-container {
+  background: white;
+  flex-flow: row wrap;
+  justify-content:center;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+  list-style: none;
+  align-items: flex-start;
+  -ms-box-orient: horizontal;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.flex-container-footer {
+  background: white;
+  flex-flow: row wrap;
+  justify-content:left ;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+  list-style: none;
+  align-items: flex-end;
+  -ms-box-orient: horizontal;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.flex-container-row {
+  background: white;
+  flex-flow: row wrap;
+  justify-content:center ;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+  list-style: none;
+  align-items: strech;
+  -ms-box-orient: horizontal;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: space-between;
+}
+
+.nowrap  { 
+  -webkit-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+}
+
+.wrap    { 
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+}  
+.wrap li {
+<!-- background: gold; -->
+}
+
+.flex-item {
+  margin-left: 10px;
+  margin-right: 20px;
+  min-width: 50px;
+  max-width: 450px;
+  height: auto;
+  position: bottom;
+  color: black;
+  font-size: 1em;
+  text-align: left;
+}
+
+.flex-item-footer {
+  margin-left: 10px;
+  margin-right: 10px;
+  min-width: 50px;
+  max-width: 200px;
+  height: auto;
+  position: bottom;
+  color: black;
+  font-size: 1em;
+  text-align: left;
+}
+
+.flex-item-big {
+  flex-grow: 3;
+  position: top;
+  height: auto;
+  min-width: 500px;
+  max-width: 500px;
+  color: black;
+  font-weight: bold;
+  font-size: 2em;
+  text-align: center;
+}
+
+.flex-item-big-footer {
+  flex-grow: 3;
+  position: right;
+  height: auto;
+  min-width: 500px;
+  max-width: 500px;
+  color: black;
+  font-weight: bold;
+  font-size: 2em;
+  text-align: center;
+}
+
+.flex-item-title {
+  flex-grow: 3;
+  position: top;
+  padding: 5px;
+  height: auto;
+  min-width: 500px;
+  color: black;
+  font-weight: bold;
+  font-size: 2em;
+  text-align: center;
+}
+
+.flex-item-small {
+  padding: 5px;
+  flex-shrink: 3;
+  margin: 10px;
+  position: bottom;
+  color: black;
+  font-size: 2em;
+}
+
+.flex-item-text {
+
+  padding: 5px;
+  width: 700px;
+  height: auto;
+  margin: 10px;
+  position: bottom;
+  color: black;
+  text-align: justify;
+}
+
+.flex-item-auto {
+
+  padding: 5px;
+  width: auto;
+  height: auto;
+  margin: 10px;
+  position: bottom;
+  color: black;
+  text-align: justify;
+}
+
+.header {
+  background: white;
+}
+
+.file-selector {
+  width: 200px;
+  height: 40px;
+background-color: rgba(55, 93, 157, 0.1);
+    font-weight: bold;
+    text-align: center;
+    padding: 20px 20px;
+    
+    color: #555;
+    border: 2px dashed #555;
+    border-radius: 7px;
+    cursor: default;
+}
+
+.file-selector.hover
+{
+    color: #f00;
+    border-color: #f00;
+    border-style: solid;
+    box-shadow: inset 0 3px 4px #888;
+}
+</style>
+
+<body onload="viz()"> 
+<!--<body>-->
+<div class="header" id="myHeader">
+    <br>
+    <ul class="flex-container wrap">
+    <h1>SteriXYZ</h1>
+    </ul>
+    <hr>
+</div>
+
+<div class="content">
+  <ul class="flex-container-row wrap">
+
+<li class="flex-item">
+    <p style="padding:10px;line-height: 1.6">
+  <h3> INTRODUCTION </h3>
+  This is a web-based implementation for calculation of <strong>Sterimol</strong> parameters for organic molecules, developed by Tipker and Verloop (<i>Pesticide Synthesis Through Rational Approaches</i>,<strong> 1984</strong>, Chapter 16, pp 279-296, DOI: <a href="https://doi.org/10.1021/bk-1984-0255.ch016" target="_blank">10.1021/bk-1984-0255.ch016</a>). Web version was inspired by wSterimol, Sterimol and DBSTEP command-line python programs developed by Brethomé and Paton (<i>ACS Catal.</i>,<strong> 2019</strong>, 9(3), pp 2313–2323, DOI: <a href="https://doi.org/10.1021/acscatal.8b04043" target="_blank">10.1021/acscatal.8b04043</a>, <a href="https://github.com/bobbypaton/wSterimol/" target="_blank">GitHub</a>, <a href="https://zenodo.org/record/1434440#.Yr4kHy8RqLc" target="_blank">Zenodo DOI:10.5281/zenodo.1434440</a>), and Luchini, Patterson, and Paton (<a href="https://zenodo.org/record/4702098#.Yr4kPy8RqLc" target="_blank">Zenodo DOI:10.5281/zenodo.4702097</a>). 
+  The main difference is the usage of xyz coordinates (in .xyz), calculation on a complete system, no requirement for installation procedure, and direct visualization of Sterimol sub-parameters (<strong>L<sub>0</sub></strong>, <a style="color:blue;"><strong>B<sub>1</sub></strong></a>, and <a style="color:green;"><strong>B<sub>5</sub></strong></a>).<br>
+  Additionally, burried volume (<a style="color:red;"><strong>%V<sub>Bur</sub></strong></a>) is calculated using similar aproach as <a href="https://www.molnac.unisa.it/OMtools/sambvca2.1/info/info.html" target="_blank">SambVca 2.1</a>, developed by Cavallo <i>et al</i> (<i>Nature Chem.</i>, <strong>2019</strong>, 11, pp. 872–879, DOI:<a href="https://doi.org/10.1038/s41557-019-0319-5" target="_blank">10.1038/s41557-019-0319-5</a>). For calculation of buried volume only definition of reaction centre is needed (see Input section). Ignoring reaction centre radius, target radius of 3.5 ångströms, mesh spacing value of 0.1 ångströms, and Bondi atomic radii scaled by 1.17 are used for the calculation.<br>
+  <h3> INPUT </h3>For input, a modified XYZ file is needed. XYZ format specifies the molecule geometry by giving the number of atoms with Cartesian coordinates that will be read on the first line, a comment on the second (usually name and/or energy), and the lines of atomic coordinates in the following lines. The units are in ångströms. After definition of atom type, x, y, and z coordinates, additional column <strong>Frag</strong> is used for assignation of fragments (0 for fixed, 1 for variable part (-R)), while column <strong>Atrib</strong> assigns atoms for primary bond of Sterimol (<strong>L<sub>0</sub></strong> parameter (1 and 2)) and target reaction centre (3). For analysis of multiple conformations, previously generated .xyz and .trj (from xtb and ORCA programs), with the <strong>same</strong> ordering of atoms as in input coordinates should be selected in the drop-zone (choose file). Botzmann averaging is performed at 298.15 K.<br>Example file for multimolecule file can be found <a href="multi.trj.xyz">here</a>.<br> 
+  <h3> CREDITS </h3> This software was developed by <a href="https://scholar.google.com/citations?hl=en&user=BBURjcwAAAAJ&view_op=list_works&sortby=pubdate" target="_blank">Davor Šakić</a> and Gabrijel Zubčić. Help from Valerije Vrček (discussion and testing) and Mateja Toma (testing) is greatly appreciated.<br>
+  Funding: <a href="http://www.hrzz.hr" target="_blank">HrZZ</a>, <a href="http://orden.pharma.hr" target="_blank">OrDeN</a>, <a href="http://light-n-ring.pharma.hr" target="_blank">LIGHT-N-RING</a>, 2022.
+  <br><br> 
+  <h3> DISCLAIMER </h3> The software and results are provided "AS IS", without warranty of any kind, express or implied. In no event shall the authors or copyright holders be liable for any claim, damages or other liability. Good luck!
+    </p>
+</li>
+
+<li class="flex-item">
+    <br>
+    <br>
+    <div id="container-01" style="width:500px; height:600px; position:relative"></div>
+    <p id="demo1"></p>
+
+</li>
+
+<li class="flex-item">
+    <p style="padding:10px;line-height: 1.6">
+    <h3>INPUT COORDINATES</h3>
+    <label for="upload">Input .xyz coordinates in format:<br> Atom, x, y, z, Frag(0,1), Atrib(0,1,2,3)</load></label><br>
+    <textarea id="links" name="upload" cols="40" rows="40" onchange="viz()">
+17
+
+C -0.0614 -0.4160 -0.0117 0 0
+C -1.4033 0.1746 -0.0476 0 0
+C -0.4719 2.2453 -0.0060 0 0
+C 1.0134 0.4922 0.0326 0 1
+H -0.6213 3.3140 -0.0147 0 0
+N 0.7704 1.8073 0.0468 0 0
+N -1.5336 1.4807 -0.0253 0 0
+N -0.2072 -1.7393 0.0571 0 3
+N -2.2710 -0.8259 -0.0161 0 0
+C -1.5227 -1.9335 0.0197 0 0
+H -1.9596 -2.9131 0.0345 0 0
+N 2.3031 0.1125 0.0207 1 2
+H 2.9737 0.8611 -0.0761 1 0
+C 2.7773 -1.2418 -0.0600 1 0
+H 3.4741 -1.4379 0.7573 1 0
+H 1.9302 -1.9210 0.0209 1 0
+H 3.2919 -1.4170 -1.0082 1 0 
+    </textarea>
+<br><br>
+<button type="submit" id="submit" name="submit" value="Visualize" onClick="viz();show()">VISUALIZE</button>
+<br><br>
+<label for="input">Input multimolecule .xyz or .trj</label><br><br>
+<input type="file" class="file-selector" accept=".xyz,.trj" onchange="readfile();viz();showAll()"><br><br>
+<p>Allow few minutes for calculation of <br>
+all parameters in multimolecule file</p>
+</li>
+</ul>
+
+<div id="results"  style="display:none">
+    <h3>RESULTS</h3>
+<ul class="flex-container-row wrap">
+<li class="flex-item"> 
+    <div id="container-03" style="width:400px; height:400px; position:relative"></div>
+  <p id="demo1"></p>
+  <p id="demo"></p>
+</li>
+<li class="flex-item">
+    <div id="container-02" style="width:400px; height:400px; position:relative"></div>
+<p><hr>Sterimol parameter visualisation from input coordinates.<br>Black arrow and circle denotes <strong>L<sub>0</sub></strong>, blue arrow and circle depict <strong><font color=blue>B<sub>1</sub></strong><font color=black>, and green arrow and circle show <strong><font color=green>B<sub>5</sub></strong><font color=black>.<br>Yellow torus segment of <strong><font color=blue>B<sub>1</sub></strong><font color=black> emphasise overlap parts if they exist.</p> 
+</li>
+<li class="flex-item">
+  <div id="container-05" style="width:400px; height:400px; position:relative"></div>
+  <p><hr></p>
+  <p id="demo5"></p>
+</li>
+</ul>
+</div>
+
+<div id="results3"  style="display:none"> 
+<ul class="flex-container-row wrap">
+<li class="flex-item">
+</li>    
+<li class="flex-item">
+  <div id="container-04" style="width:400px; height:400px; position:relative"></div>
+  <p><hr></p> 
+  <p id="demo2"></p>
+  <p id="demo3"></p>
+</li>
+<li class="flex-item">
+  <div id="container-06" style="width:400px; height:400px; position:relative"></div>
+  <p><hr></p>
+  <p id="demo6"></p>
+</li> 
+<li class="flex-item">
+</li>    
+</ul>
+</div>
+
+</div>
+</div>
+
+
+<script>
+
+function show(){
+    document.getElementById('results').style.display = 'block';
+    //document.getElementById('results3').style.display = 'block';
+    document.getElementById('results').scrollIntoView();
+}
+
+function showAll(){
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results3').style.display = 'block';
+    document.getElementById('results').scrollIntoView();
+}
+
+
+var target_radius = 3.0;
+var size = 0.07;
+var global_l0;
+
+function Atom(optional){
+  if (optional){
+    this.elem = optional.elem
+    this.x = optional.x
+    this.y = optional.y
+    this.z = optional.z
+    this.f = optional.f
+    this.alt = optional.alt
+    this.w = 0
+    this.rad = optional.rad
+    this.resi = optional.c
+    this.bonds = optional.bonds
+    this.vdW = optional.vdW
+
+  }else{
+    this.elem = "X"
+    this.x = 0
+    this.y = 0
+    this.z = 0
+    this.f = 0
+    this.alt = 0
+    this.w = 0
+    this.rad = 0
+    this.resi = 0
+    this.bonds = 0
+    this.vdW = 0
+
+  }
+}
+
+function DistVec(first,second,optional,dist,cov,vdW){
+    if (optional){
+    this.first = first;
+    this.second = second;
+    this.x = optional.x;
+    this.y = optional.y;
+    this.z = optional.z;
+    this.dist = dist;  
+    this.cov = cov;
+    this.vdW = vdW;
+    }
+    else{
+    this.first = 0;
+    this.second = 0;
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+    this.dist = 0;  
+    this.cov = 0; 
+    this.vdW = 0;
+    }
+}
+
+Atom.prototype.Distance = function(vector){
+var out = Math.sqrt(Math.pow(this.x-vector.x,2)+Math.pow(this.y-vector.y,2)+Math.pow(this.z-vector.z,2));
+return out;
+}
+
+Atom.prototype.CovBond = function(vector){
+  var covbond = this.rad + vector.rad;
+  return covbond.toFixed(5);
+}
+
+Atom.prototype.plus1 = function(vector){
+var out = new Atom({
+x : this.x + vector.x,
+y : this.y + vector.y,
+z : this.z + vector.z,
+});
+//    this.x = out.x.toFixed(5);
+//    this.y = out.y.toFixed(5);
+//    this.z = out.z.toFixed(5);
+this.x = out.x;
+this.y = out.y;
+this.z = out.z;
+}
+
+Atom.prototype.minus1 = function(vector){
+var out = new Atom();
+out.x = this.x - (vector.x);
+out.y = this.y - (vector.y);
+out.z = this.z - (vector.z);
+//    this.x = out.x.toFixed(5);
+//    this.y = out.y.toFixed(5);
+//    this.z = out.z.toFixed(5);
+this.x = out.x;
+this.y = out.y;
+this.z = out.z;
+}
+
+minus = function(atom1,vec){
+var out = new Atom();
+out.elem = atom1.elem;
+out.f = atom1.f;
+out.alt = atom1.alt;
+out.w = 0
+out.rad = atom1.rad
+out.resi = atom1.resi
+out.bonds = atom1.bonds
+out.vdW = atom1.vdW
+out.x = atom1.x - (vec.x);
+out.y = atom1.y - (vec.y);
+out.z = atom1.z - (vec.z);
+return out;   
+}
+
+Atom.prototype.QuaternionMultiply = function(vectorB) {
+    var out = new Atom();
+    out.w = this.w*vectorB.w - this.x*vectorB.x - this.y*vectorB.y - this.z*vectorB.z;
+    out.x = this.w*vectorB.x + this.x*vectorB.w + this.y*vectorB.z - this.z*vectorB.y;
+    out.y = this.w*vectorB.y - this.x*vectorB.z + this.y*vectorB.w + this.z*vectorB.x;
+    out.z = this.w*vectorB.z + this.x*vectorB.y - this.y*vectorB.x + this.z*vectorB.w;
+    this.x = out.x;
+    this.y = out.y;
+    this.z = out.z;
+    this.w = out.w;
+}
+
+Atom.prototype.rotate = function(inputaxis, inputangle) 
+{
+    var vector = new Atom(this);
+    vector.w = 0;
+//demo += (Object.values(vector)+"<br>");
+    var axis = new Atom({ 
+x: inputaxis.x * Math.sin(inputangle/2),     
+y: inputaxis.y * Math.sin(inputangle/2),     
+z: inputaxis.z * Math.sin(inputangle/2),     
+w: Math.cos(inputangle/2)} 
+);
+
+    var axisInv = new Atom({ x: -axis.x, y: -axis.y, z: -axis.z, w: -axis.w});
+
+    axis.QuaternionMultiply(vector);
+    axis.QuaternionMultiply(axisInv);
+
+    this.x = axis.x.toFixed(5);
+    this.y = axis.y.toFixed(5);
+    this.z = axis.z.toFixed(5);
+    this.w = axis.w.toFixed(5);
+}
+
+Atom.prototype.size = function() {
+  var size = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);  
+  return size;
+}
+
+Atom.prototype.scale = function(scale) { 
+  this.x = this.x*scale;
+  this.y = this.y*scale;
+  this.z = this.z*scale;
+}
+
+Atom.prototype.normalize = function() {
+  //scales a vector back to a unit vector. It will have a length of 1
+  var lengthval = this.size()
+
+  if (lengthval != 0) {
+    this.x /= lengthval;
+    this.y /= lengthval;
+    this.z /= lengthval; 
+    return true 
+  } else { 
+    return false
+  }
+}
+
+Atom.prototype.angle = function(vecA){
+    var dot = vecA.x*this.x + vecA.y*this.y + vecA.z*this.z;
+    var angle = Math.acos( dot / (vecA.size() + this.size()) );
+    return angle;
+}
+
+Atom.prototype.RandGen = function(){
+this.x = Math.random()*2-1;
+this.y = Math.random()*2-1;
+this.z = Math.random()*2-1;
+}
+
+var covRadius = {He:0.28, H:0.31, F:0.57, Ne:0.58, O:0.66, N:0.71, C:0.76, B:0.85, Be:0.96, Cl:1.02, S:1.05, Ar:1.06, P:1.07, S:1.11, Kr:1.16, As:1.19, Ge:1.2, Se:1.2, Br:1.2, Al:1.21, Zn:1.22, Ga:1.22, Ni:1.24, Co:1.26, Li:1.28, Cu:1.32, Hg:1.32, Pt:1.36, Au:1.36, Te:1.38, Cr:1.39, Mg:1.39, Pd:1.39, Sn:1.39, Sb:1.39, I:1.39, Xe:1.4, Po:1.4, Mg:1.41, Ir:1.41, Rh:1.42, In:1.42, Cd:1.44, Os:1.44, Ag:1.45, Tl:1.45, Ru:1.46, Pb:1.46, Tc:1.47, Bi:1.48, At:1.5, Ra:1.5, Re:1.51, V:1.53, Mo:1.54, Ti:1.6, W:1.62, Nb:1.64, Na:1.66, Cm:1.69, Sc:1.7, Ta:1.7, Zr:1.75, Hf:1.28, Ca: 1.76, Am:1.8, Yb:1.87, Lu:1.87, Pu:1.87, Er:1.89, Y:1.9, Tm:1.9, Np:1.9, Dy:1.92, Ho:1.92, Tb:1.94, Sr:1.95, Gd:1.96, U:1.96, Sm:1.98, Eu:1.98, Pm:1.99, Pa:2, Nd:2.01, K:2.03, Pr:2.03, Ce:2.04, Th:2.06, La:2.07, Ba:2.15, Ac:2.15, Rb:2.2, Ra:2.21, Cs:2.44, Fr:2.6, X:0.01}; 
+
+var vanDerWaalsRadius = {Ac:2,Al:2,Am:2,Sb:2,Ar:1.88,As:1.85,At:2,Ba:2,Bk:2,Be:2,Bi:2,Bh:2,B:2,Br:1.85,Cd:1.58,Cs:2,Ca:2,Cf:2,C:1.7,Ce:2,Cl:1.75,Cr:2,Co:2,Cu:1.4,Cm:2,Ds:2,Db:2,Dy:2,Es:2,Er:2,Eu:2,Fm:2,F:1.47,Fr:2,Gd:2,Ga:1.87,Ge:2,Au:1.66,Hf:2,Hs:2,He:1.4,Ho:2,H:1.09,In:1.93,I:1.98,Ir:2,Fe:2,Kr:2.02,La:2,Lr:2,Pb:2.02,Li:1.82,Lu:2,Mg:1.73,Mn:2,Mt:2,Md:2,Hg:1.55,Mo:2,Nd:2,Ne:1.54,Np:2,Ni:1.63,Nb:2,N:1.55,No:2,Os:2,O:1.52,Pd:1.63,P:1.8,Pt:1.72,Pu:2,Po:2,K:2.75,Pr:2,Pm:2,Pa:2,Ra:2,Rn:2,Re:2,Rh:2,Rb:2,Ru:2,Rf:2,Sm:2,Sc:2,Sg:2,Se:1.9,Si:2.1,Ag:1.72,Na:2.27,Sr:2,S:1.8,Ta:2,Tc:2,Te:2.06,Tb:2,Tl:1.96,Th:2,Tm:2,Sn:2.17,Ti:2,W:2,U:1.86,V:2,Xe:2.16,Yb:2,Y:2,Zn:1.39,Zr:2, X:0.01}
+
+var bondiRadius = {H:1.09,He:1.40,Li:1.82,Be:1.53,B:1.92,C:1.70,N:1.55,O:1.52,F:1.47,Ne:1.54,Na:2.27,Mg:1.73,Al:1.84,Si:2.10,P:1.80,S:1.80,Cl:1.75,Ar:1.88,K:2.75,Ca:2.31,Sc:2.15,Ti:2.11,V:2.07,Cr:2.06,Mn:2.05,Fe:2.04,Co:2.00,Ni:1.63,Cu:1.40,Zn:1.39,Ga:1.87,Ge:2.11,As:1.85,Se:1.90,Br:1.85,Kr:2.02,Rb:3.03,Sr:2.49,Y:2.32,Zr:2.23,Nb:2.18,Mo:2.17,Tc:2.16,Ru:2.13,Rh:2.10,Pd:1.63,Ag:1.72,Cd:1.58,In:1.93,Sn:2.17,Sb:2.06,Te:2.06,I:1.98,Xe:2.16,Cs:3.43,Ba:2.68,La:2.43,Ce:2.42,Pr:2.40,Nd:2.39,Pm:2.38,Sm:2.36,Eu:2.35,Gd:2.34,Tb:2.33,Dy:2.31,Ho:2.30,Er:2.29,Tm:2.27,Yb:2.26,Lu:2.24,Hf:2.23,Ta:2.22,W:2.18,Re:2.16,Os:2.16,Ir:2.13,Pt:1.72,Au:1.66,Hg:1.55,Tl:1.96,Pb:2.02,Bi:2.07,Po:1.97,At:2.02,Rn:2.20,Fr:3.48,Ra:2.83,Ac:2.47,Th:2.45,Pa:2.43,U:1.86,Np:2.39,Pu:2.43,Am:2.44,Cm:2.45,Bk:2.44,Cf:2.45,Es:2.45,Fm:2.45,Md:2.46,No:2.46,Lr:2.46}
+
+var bondiScaledRadius = {H:1.28,He:1.64,Li:2.13,Be:1.79,B:2.25,C:1.99,N:1.81,O:1.78,F:1.72,Ne:1.80,Na:2.66,Mg:2.02,Al:2.15,Si:2.46,P:2.11,S:2.11,Cl:2.05,Ar:2.20,K:3.22,Ca:2.70,Sc:2.52,Ti:2.47,V:2.42,Cr:2.41,Mn:2.40,Fe:2.39,Co:2.34,Ni:1.91,Cu:1.64,Zn:1.63,Ga:2.19,Ge:2.47,As:2.16,Se:2.22,Br:2.16,Kr:2.36,Rb:3.55,Sr:2.91,Y:2.71,Zr:2.61,Nb:2.55,Mo:2.54,Tc:2.53,Ru:2.49,Rh:2.46,Pd:1.91,Ag:2.01,Cd:1.85,In:2.26,Sn:2.54,Sb:2.41,Te:2.41,I:2.32,Xe:2.53,Cs:4.01,Ba:3.14,La:2.84,Ce:2.83,Pr:2.81,Nd:2.80,Pm:2.78,Sm:2.76,Eu:2.75,Gd:2.74,Tb:2.73,Dy:2.70,Ho:2.69,Er:2.68,Tm:2.66,Yb:2.64,Lu:2.62,Hf:2.61,Ta:2.60,W:2.55,Re:2.53,Os:2.53,Ir:2.49,Pt:2.01,Au:1.94,Hg:1.81,Tl:2.29,Pb:2.36,Bi:2.42,Po:2.30,At:2.36,Rn:2.57,Fr:4.07,Ra:3.31,Ac:2.89,Th:2.87,Pa:2.84,U:2.18,Np:2.80,Pu:2.84,Am:2.85,Cm:2.87,Bk:2.85,Cf:2.87,Es:2.87,Fm:2.87,Md:2.88,No:2.88,Lr:2.88}
+
+function viz(){
+//READ FROM FORM
+    var lines = $('#links').val().split(/\n/);
+    var texts = [];
+    if ( lines[1] === ''){
+    lines[1]=0.0;
+    }
+    if ( lines[1] === ' '){
+    lines[1]=0.0;
+    }
+    for (var i=0; i < lines.length; i++) {
+  if (/\S/.test(lines[i])) {
+texts.push($.trim(lines[i]));
+  }
+    }
+
+//REPORTING VARIABLE DEMO
+var demo = [];
+var demo5 = [];
+var atom = [];
+for (var i=0; i < texts.length-2; i++) {
+var coor = texts[i+2].trim().split(" ");
+coor = coor.filter(Boolean);
+atom[i] = new Atom({elem: coor[0], x: Number(coor[1]), y: Number(coor[2]), z: Number(coor[3]), f: Number(coor[4]), rad: Number(covRadius[coor[0]]), c: 0, alt: Number(coor[5])});
+}
+
+var val1=0.8;
+var val2=1.2;
+
+var atom_num = 0
+for (var i=0; i<atom.length; i++){
+    if (atom[i].elem != "X"){
+  if (atom[i].elem.toUpperCase() === atom[i].elem[0] ){
+atom_num++
+  } else {
+atom.splice(i,1);
+i--;
+  }
+    }
+} 
+
+var bond = [];
+for (var i=0; i < atom.length; i++) {
+bond[i] = [];
+for (var k=0; k < atom.length; k++) {
+//if (atom[i].f == atom[k].f){
+if (i != k) {
+var dist = atom[i].Distance(atom[k]);
+var cov = atom[i].CovBond(atom[k]);
+if (val1*cov <= dist && dist <= val2*cov){
+bond[i].push(k);
+}
+}
+//}
+}
+atom[i].bonds = bond[i];
+}
+
+var newPointStart;
+for (var i=0; i < atom.length; i++) {
+if (atom[i].alt == 1){
+newPointStart = atom[i];
+}
+}
+
+var atoms1 = [];
+for (var i=0; i < atom.length; i++){
+atoms1[i]=minus(atom[i],newPointStart);
+if (atoms1[i].alt == 2){
+var newPointEnd = atoms1[i];
+}
+if (atoms1[i].alt == 3){
+var newPointTarget = atoms1[i];
+}
+}
+
+newPointStart.minus1(newPointStart);
+
+var l1 = newPointStart.Distance(newPointEnd);
+demo += ("<hr>");
+
+var vector12 = minus(newPointEnd,newPointStart);
+
+var newPointStart1 = new Atom({elem: "X", x: 0, y: 0, z: 0, w:0, f: 0});
+var newPointEnd1 = new Atom({elem: "X", x: 0, y: 0, z: l1, w:0, f: 0});
+var newPointEnd2 = new Atom({elem: "X", x: 0, y: 1, z: 0, w:0, f: 0});
+var newPointEnd3 = new Atom({elem: "X", x: 1, y: 0, z: 0, w:0, f: 0});
+
+var vectorZ = minus(newPointEnd1,newPointStart1);
+var vectorY = minus(newPointEnd2,newPointStart1);
+var vectorX = minus(newPointEnd3,newPointStart1);
+
+var specAtoms = [newPointStart,newPointEnd,newPointTarget];
+
+$(function() {
+  let element = $('#container-01');
+  let config = { backgroundColor: '#fbfbfb' };
+  let viewer = $3Dmol.createViewer( element, config );
+var m = viewer.addModel();
+m.addAtoms(atoms1);
+m.setStyle({},{sphere:{scale:0.3},stick:{radius:0.2}});
+viewer.addArrow({start:newPointStart,end:newPointEnd,radius:0.05});
+viewer.addSphere({center:{x:specAtoms[0].x,y:specAtoms[0].y,z:specAtoms[0].z},radius:specAtoms[0].rad,color:'blue',opacity:0.4});
+viewer.addSphere({center:{x:specAtoms[1].x,y:specAtoms[1].y,z:specAtoms[1].z},radius:specAtoms[1].rad,color:'green',opacity:0.4});
+viewer.addSphere({center:{x:specAtoms[2].x,y:specAtoms[2].y,z:specAtoms[2].z},radius:specAtoms[2].rad,color:'red',opacity:0.4});
+viewer.zoomTo();
+viewer.render();
+
+});
+
+
+var vectorW = new Atom({elem: "X", x: vector12.x, y: vector12.y, z: vector12.z, w:vector12.w, f: 0});
+vectorW.normalize();
+vectorW.QuaternionMultiply(vectorZ);
+vectorW.normalize();
+
+vector12alt = new THREE.Vector3(vector12.x,vector12.y,vector12.z);
+angle=vector12alt.angleTo( new THREE.Vector3(0,0,1));
+//demo+=("Angle "+angle+"<br>");
+
+var atoms2 = [];
+for (var i=0; i < atoms1.length; i++){
+atoms2[i] = new Atom(atoms1[i]);
+var scale=atoms2[i].size();
+atoms2[i].normalize();    
+const quaternion = new THREE.Quaternion(); 
+quaternion.setFromAxisAngle( new THREE.Vector3( vectorW.x, vectorW.y, vectorW.z ), angle ); 
+const vector = new THREE.Vector3( atoms2[i].x, atoms2[i].y, atoms2[i].z ); 
+vector.applyQuaternion( quaternion );
+atoms2[i].x = vector.x;
+atoms2[i].y = vector.y;
+atoms2[i].z = vector.z;
+atoms2[i].scale(scale);
+//demo+=(Object.values(atoms2[i])+"<br>");
+}
+
+var frag_pos_x = [];
+var frag_pos_y = [];
+var frag_pos_z = [];
+
+var orient = new Atom();
+for (var i=0; i < atoms2.length; i++){
+    if(atoms2[i].f == 1){
+frag_pos_x.push(atoms2[i].x+vanDerWaalsRadius[atoms2[i].elem]); 
+frag_pos_x.push(atoms2[i].x-vanDerWaalsRadius[atoms2[i].elem]);
+frag_pos_y.push(atoms2[i].y+vanDerWaalsRadius[atoms2[i].elem]);
+frag_pos_y.push(atoms2[i].y-vanDerWaalsRadius[atoms2[i].elem]);
+frag_pos_z.push(atoms2[i].z+vanDerWaalsRadius[atoms2[i].elem]);
+frag_pos_z.push(atoms2[i].z-vanDerWaalsRadius[atoms2[i].elem]);
+    }
+    if (atoms2[i].alt == 3){
+  orient.elem = "X1";
+  orient.x = atoms2[i].x;
+  orient.y = atoms2[i].y;
+  orient.z = atoms2[i].z;
+    }
+}
+
+var l0 = Math.max(...frag_pos_z);
+var newPointEnd0 = new Atom({elem: "X", x: 0, y: 0, z: l0, w:0, f: 0});
+
+var distance_target2fragment=[];
+for (var i=0; i < atoms2.length; i++){
+if (atoms2[i].f == 1){
+distance_target2fragment.push(atoms2[i].Distance(orient));
+}
+}
+var min_distance_target2fragment=Math.min(...distance_target2fragment).toFixed(3);
+
+var atoms3 = [];
+var atoms4 = [];
+for (var i=0; i < atoms1.length; i++){
+    atoms3[i] = new Atom(atoms2[i]);
+if (atoms3[i].f == 0){
+    atoms3[i].elem = "X";
+}
+if (atoms3[i].f == 1){
+    atoms3[i].z = l1;
+    atoms4.push(new Atom(atoms2[i]));
+    atoms4[atoms4.length-1].x = 0;
+    atoms4[atoms4.length-1].y = 0;
+}
+if (atoms3[i].alt == 3){
+    atoms3[i].elem = "X1";
+}
+}
+
+var bond = [];
+for (var i=0; i < atoms4.length; i++) {
+bond[i] = [];
+for (var k=0; k < atoms4.length; k++) {
+//if (atom[i].f == atom[k].f){
+if (i != k) {
+var dist = atom[i].Distance(atom[k]);
+var cov = atom[i].CovBond(atom[k]);
+if (dist <= val2*cov){
+bond[i].push(k);
+}
+}
+//}
+}
+atoms4[i].bonds = bond[i];
+}
+
+var distsize = [];
+var distvecfrag = [];
+for (var i=0; i<atoms3.length; i++){
+    if (atoms3[i].f == 1){
+    if (atoms3[i].alt == 2){
+  var newPointStart1=atoms2[i];
+    for (var k=0; k<atoms3.length; k++){
+  if (atoms3[k].f == 1){
+var dista1 = new Atom(atoms3[i]);
+dista1.z=0;
+var dista2 = new Atom(atoms3[k]);
+dista2.z=0;
+dista1.plus1(dista2);
+var scale1=dista1.size()+vanDerWaalsRadius[atoms3[k].elem];
+distsize.push(scale1);
+dista1.normalize();
+dista1.scale(scale1);
+dista1.z = l1;
+distvecfrag.push(dista1);
+  }
+    }    
+    }
+    }
+}
+
+var b5val = Math.max(...distsize);
+var b1val = Math.min(...distsize);
+
+var check4b1 = 0
+
+while (check4b1 < 1){
+
+var check100 = 359;
+//console.log(b1val);
+var check_b1 = b1val+0.001;
+var checkPoint = [];
+for (i=0; i<check100; i++){
+var angle = (i/360)*Math.PI*2;
+var xpoint = Math.cos(angle)*check_b1;
+var ypoint = Math.sin(angle)*check_b1;
+checkPoint[i] = new Atom({elem:'X',x:xpoint,y:ypoint,z:0,w:0,f:1,alt:0});
+}
+
+for (i=0; i<checkPoint.length; i++){
+for (j=0; j<atoms3.length; j++){
+    if(atoms3[j].f == 1){
+var dista3 = checkPoint[i].Distance(atoms3[j]);
+if (dista3 < vanDerWaalsRadius[atoms3[j].elem]){
+    checkPoint[i].alt=1;
+}
+}
+}
+}
+
+var preklopPoint = [];
+for (i=0; i<checkPoint.length; i++){
+if(checkPoint[i].alt == 1){
+    preklopPoint.push(checkPoint[i]);
+    preklopPoint[preklopPoint.length-1].z = l1;
+}
+}
+
+if (preklopPoint.length > 160){
+distsize[distsize.indexOf(b1val)] = +Infinity;
+b1val = Math.min(...distsize);
+} else {
+check4b1=1
+}
+
+}
+
+var b1 = new Atom(distvecfrag[distsize.indexOf(b1val)]);
+var b5 = new Atom(distvecfrag[distsize.indexOf(b5val)]);
+demo+= ("Sterimol parameters from input coordinates"+"<br>"+"<br>");
+demo+= ("<strong>L<sub>0</sub></strong> = "+l0.toFixed(3)+"<br>");
+demo+=("<strong><FONT COLOR = blue>B<sub>1</sub></strong> = "+b1val.toFixed(3)+"<br>");
+demo+=("<strong><FONT COLOR = green>B<sub>5</sub></strong> = "+b5val.toFixed(3)+"<FONT COLOR = black><br>");
+demo+=("<br>")
+demo+= ("Minimal distance from target to fragment " + min_distance_target2fragment+"<br>");
+
+
+$(function() {
+  let element = $('#container-02');
+  let config = { backgroundColor: '#fbfbfb' };
+  let viewer = $3Dmol.createViewer( element, config );
+var m = viewer.addModel();
+m.addAtoms(atoms2);
+m.setStyle({},{sphere:{scale:0.3,opacity:0.4},stick:{radius:0.2,opacity:1}});
+viewer.addCylinder({start:{x:newPointStart.x,y:newPointStart.y,z:newPointStart.z+l1-0.2},
+    end:{x:newPointStart.x,y:newPointStart.y,z:newPointStart.z+l1+0.2},
+    radius:b1val,
+    color:'blue',
+    opacity:0.8
+   });
+viewer.addCylinder({start:{x:newPointStart.x,y:newPointStart.y,z:newPointStart.z+l1-0.2},
+    end:{x:newPointStart.x,y:newPointStart.y,z:newPointStart.z+l1+0.2},
+    radius:b5val,
+    color:'green',
+    opacity:0.8
+   });
+viewer.addCylinder({start:{x:newPointStart.x-0.2,y:newPointStart.y,z:newPointStart1.z},
+    end:{x:newPointStart.x+0.2,y:newPointStart.y,z:newPointStart1.z},
+    radius:l0-l1,
+    color:'black',
+    opacity:0.8
+   });
+var n = viewer.addModel();
+n.addAtoms(preklopPoint);
+//viewer.addArrow({start:{x:0.0,y:0.0,z:0.0},end:{x:5.0,y:0.0,z:0.0},radius:0.1, color:"red"});
+viewer.addArrow({start:newPointStart,end:newPointEnd0,radius:0.1, color:"black"});
+viewer.addArrow({start:newPointStart1,end:b1,radius:0.1, color:"blue"});
+viewer.addArrow({start:newPointStart1,end:b5,radius:0.1, color:"green"});
+viewer.addStyle({elem:'X'},{sphere:{scale:0.1,color:"#ffff00"}});
+viewer.zoomTo();
+viewer.render();
+});
+
+$(function() {
+  let element = $('#container-03');
+  let config = { backgroundColor: '#fbfbfb' };
+  let viewer = $3Dmol.createViewer( element, config );
+var m = viewer.addModel();
+m.addAtoms(atoms3);
+m.setStyle({},{sphere:{scale:0.95,opacity:0.4},stick:{radius:0.2,opacity:1}});
+var n = viewer.addModel();
+n.addAtoms(atoms4);
+n.setStyle({},{sphere:{scale:0.95,opacity:0.4},stick:{radius:0.2,opacity:1}});
+viewer.addArrow({start:newPointStart1,end:newPointEnd0,radius:0.1});
+viewer.addArrow({start:newPointStart1,end:b1,radius:0.1, color:"blue"});
+viewer.addArrow({start:newPointStart1,end:b5,radius:0.1, color:"green"});
+viewer.addStyle({elem:'X'},{sphere:{scale:0.2,color:"#ffff00"}});
+viewer.addStyle({elem:'X1'},{sphere:{scale:1.5}});
+viewer.zoomTo();
+viewer.render();
+});
+
+for (i=0; i<atoms2.length; i++){
+if (atoms2[i].alt == 3){
+var pointTarget = atoms2[i];
+}
+}
+
+var radiusBur = 3.5;
+var voxelSize = 0.1;
+var nopoint = Math.floor(2*radiusBur/voxelSize);
+var voxel = [];
+for (q=0; q<nopoint; q++){
+    for(w=0; w<nopoint; w++){
+        for (e=0; e<nopoint; e++){
+voxel.push(new Atom({elem: "X", x: pointTarget.x-radiusBur+q*voxelSize, y: pointTarget.y-radiusBur+w*voxelSize, z: pointTarget.z-radiusBur+e*voxelSize}));
+        }
+    }
+}
+
+for (var q=voxel.length-1; q > -1; q--){
+var dist1 = voxel[q].Distance(pointTarget);
+if (dist1 > radiusBur){
+voxel.splice(q,1);
+} 
+}
+var voxstart = voxel.length;
+demo5 += ("SambVca buried volume from input coordinates"+"<br>"+"<br>"+"No of all voxels: "+voxstart+"<br>" );
+
+var newVoxel = voxel;
+var occVoxel = [];
+for (i=0; i<atoms2.length; i++){
+if (atoms2[i].alt != 3){
+    var dist2 = atoms2[i].Distance(pointTarget)-bondiScaledRadius[atoms2[i].elem];
+    if (dist2 < radiusBur){
+        for (var q=newVoxel.length-1; q > -1; q--){
+            var dist3 = atoms2[i].Distance(newVoxel[q]);
+            if (dist3 < bondiScaledRadius[atoms2[i].elem]){
+                occVoxel.push(newVoxel.splice(q,1));
+            }    
+        }
+    }
+}
+}
+
+var voxend = newVoxel.length;
+demo5 += ("No of unoccupied voxels: "+voxend+"<br>" );
+var voxdiff = occVoxel.length;
+demo5 += ("No of occupied voxels: "+voxdiff+"<br>" );
+var vbur = ((voxdiff/voxstart)*100).toFixed(2);
+demo5 += ("<br>"+"<strong><FONT COLOR = red>V<sub>Bur</sub></strong> = "+vbur+"%<FONT COLOR = black><br>");
+
+$(function() {
+  let element = $('#container-05');
+  let config = { backgroundColor: '#fbfbfb' };
+  let viewer = $3Dmol.createViewer( element, config );
+var m = viewer.addModel();
+m.addAtoms(atoms2);
+m.setStyle({},{sphere:{scale:0.3,opacity:1},stick:{radius:0.2}});
+m.addAtoms(voxel);
+m.setStyle({elem:'X'},{sphere:{opacity:1,scale:0.01}});
+//viewer.addStyle({elem:'X'},{sphere:{scale:0.01,color:"black"}});
+viewer.zoomTo();
+viewer.render();
+});
+
+
+var demo1 = [];
+demo1 += ("*3Dmol.js: molecular visualization with WebGL<br>"+
+"N. Rego, D. Koes, <em>Bioinformatics</em> <strong>2015</strong>, <em>31</em>(8), 1322 - 1324.<br>")
+
+document.getElementById('demo').innerHTML = demo ;
+document.getElementById('demo1').innerHTML = demo1 ;
+document.getElementById('demo5').innerHTML = demo5 ;
+global_l0 = l0;
+}
+
+//READ MULTI FILE
+function readfile(){
+
+  let fileReader = new FileReader();
+  fileReader.onload = function () {
+    let texts1 = (fileReader.result);
+calculate_all(texts1);
+   
+    }
+  fileReader.readAsText(document.querySelector('.file-selector').files[0]);  
+}
+
+//CALCULATE MULTI FILE
+function calculate_all(texts1){
+
+//READ FROM FORM
+    var lines = $('#links').val().split(/\n/);
+    if ( lines[1] === ''){
+    lines[1]=0.0;
+    }
+    if ( lines[1] === ' '){
+    lines[1]=0.0;
+    }
+    var texts = [];
+    for (var i=0; i < lines.length; i++) {
+  if (/\S/.test(lines[i])) {
+texts.push($.trim(lines[i]));
+  }
+    }
+
+var atom = [];
+for (var i=0; i < texts.length-2; i++) {
+var coor2 = texts[i+2].trim().split(" ");
+coor2 = coor2.filter(Boolean);
+atom[i] = new Atom({elem: coor2[0], x: Number(coor2[1]), y: Number(coor2[2]), z: Number(coor2[3]), f: Number(coor2[4]), rad: Number(covRadius[coor2[0]]), c: 0, alt: Number(coor2[5])});
+}
+
+var atom_num = 0
+for (var i=0; i<atom.length; i++){
+    if (atom[i].elem != "X"){
+  if (atom[i].elem.toUpperCase() === atom[i].elem[0] ){
+atom_num++
+  }
+    }
+} 
+
+var demo2 = ("Sterimol parameter visualisation and geometries from multimolecule input"+"<br>"+"<br>");
+demo2+=("Number of atoms in molecule: "+atom_num+"<br>");
+
+var demo3 = ("Molecule"+"<br>"+"No Ratio "+"<strong>L<sub>0</sub></strong> "+"<strong><FONT COLOR = blue>B<sub>1</sub></strong> "+"<strong><FONT COLOR = green>B<sub>5</sub></strong> <FONT COLOR = black>"+"<br>");
+var demo6 = ("Normalized <strong><FONT COLOR = red>V<sub>Bur</sub></strong> = ");
+var demo61 = ("<br>"+"Molecule"+"<br>"+"No Ratio <strong><FONT COLOR = red>%V<sub>Bur</sub> <FONT COLOR = black></strong>"+"<br>");
+var splitval = atom_num+2;
+
+var texts1splt=texts1.split("\n");
+
+var noMol = Math.floor(texts1splt.length/splitval);
+demo2+=("Number of molecules in file: "+noMol+"<br>");
+
+var mol = [];
+var mol_frag = [];
+var mol_base = [];
+var mol_energies=[];
+
+for (j=0; j<noMol; j++){
+mol_energies.push(Number(texts1splt[j*splitval+1].trim()));
+mol[j]=[]
+for (i=0; i<atom_num; i++){
+var coor1 = texts1splt[j*splitval+i+2].trim().split(" ");
+coor1 = coor1.filter(Boolean);
+    mol[j][i]=new Atom({elem: coor1[0], x: Number(coor1[1]), y: Number(coor1[2]), z: Number(coor1[3]), f: atom[i].f, rad: Number(covRadius[coor1[0]]), c: 0, alt: atom[i].alt});
+}
+}
+
+var mol_energies_min=Math.min(...mol_energies);
+var mol_energies_ratio_nonorm=[];
+var normale = 0;
+var temp=298.15;
+for (i=0;i<mol_energies.length;i++){
+    mol_energies_ratio_nonorm[i]=Math.exp((mol_energies_min-mol_energies[i])*627.509*4.184*1000/(temp*8.314));
+    normale += mol_energies_ratio_nonorm[i];
+}
+var norm = 0;
+var mol_energies_ratio_norm = [];
+for (i=0;i<mol_energies.length;i++){
+    mol_energies_ratio_norm[i]=mol_energies_ratio_nonorm[i]/normale;
+    norm += mol_energies_ratio_norm[i];
+}
+
+demo2+=("<br>");
+
+const val1 = 0.8;
+const val2 = 1.2;
+
+var mol_l0 = [];
+var mol_b1 = [];
+var mol_b5 = [];
+var mol_vbur = [];
+var mol_l0_vect = [];
+var mol_b1_vect = [];
+var mol_b5_vect = [];
+var mol_dist_targ2frag = [];
+var mol_l0_norm_all = 0;
+var mol_b1_norm_all = 0;
+var mol_b5_norm_all = 0;
+var mol_vbur_norm_all = 0;
+var mol_dist_targ2frag_norm_all = 0;
+
+//FOR EACH MOLECULE
+for (z=0; z<mol.length; z++){
+var atom = [];
+for (i=0; i<mol[z].length; i++){
+atom[i]=mol[z][i];
+}
+var bond = [];
+for (var i=0; i < atom.length; i++) {
+bond[i] = [];
+for (var k=0; k < atom.length; k++) {
+if (atom[i].f == atom[k].f){
+if (i != k) {
+var dist = atom[i].Distance(atom[k]);
+var cov = atom[i].CovBond(atom[k]);
+if (val1*cov <= dist && dist <= val2*cov){
+bond[i].push(k);
+}
+}
+}
+}
+atom[i].bonds = bond[i];
+}
+
+var newPointStart;
+for (var i=0; i < atom.length; i++) {
+if (atom[i].alt == 1){
+newPointStart = atom[i];
+}
+}
+
+var atoms1 = [];
+for (var i=0; i < atom.length; i++){
+atoms1[i]=minus(atom[i],newPointStart);
+if (atoms1[i].alt == 2){
+var newPointEnd = atoms1[i];
+}
+}
+
+newPointStart.minus1(newPointStart);
+
+
+var l1 = newPointStart.Distance(newPointEnd);
+
+var vector12 = minus(newPointEnd,newPointStart);
+
+var newPointStart1 = new Atom({elem: "X", x: 0, y: 0, z: 0, w:0, f: 0});
+var newPointEnd1 = new Atom({elem: "X", x: 0, y: 0, z: l1, w:0, f: 0});
+var newPointEnd2 = new Atom({elem: "X", x: 0, y: 1, z: 0, w:0, f: 0});
+var newPointEnd3 = new Atom({elem: "X", x: 1, y: 0, z: 0, w:0, f: 0});
+
+var vectorZ = minus(newPointEnd1,newPointStart1);
+var vectorY = minus(newPointEnd2,newPointStart1);
+var vectorX = minus(newPointEnd3,newPointStart1);
+
+var vectorW = new Atom({elem: "X", x: vector12.x, y: vector12.y, z: vector12.z, w:vector12.w, f: 0});
+vectorW.normalize();
+vectorW.QuaternionMultiply(vectorZ);
+vectorW.normalize();
+
+vector12alt = new THREE.Vector3(vector12.x,vector12.y,vector12.z);
+angle=vector12alt.angleTo( new THREE.Vector3(0,0,1));
+//demo+=("Angle "+angle+"<br>");
+
+var atoms2 = [];
+for (var i=0; i < atoms1.length; i++){
+atoms2[i] = new Atom(atoms1[i]);
+var scale=atoms2[i].size();
+atoms2[i].normalize();    
+const quaternion = new THREE.Quaternion(); 
+quaternion.setFromAxisAngle( new THREE.Vector3( vectorW.x, vectorW.y, vectorW.z ), angle ); 
+const vector = new THREE.Vector3( atoms2[i].x, atoms2[i].y, atoms2[i].z ); 
+vector.applyQuaternion( quaternion );
+atoms2[i].x = vector.x;
+atoms2[i].y = vector.y;
+atoms2[i].z = vector.z;
+atoms2[i].scale(scale);
+//demo+=(Object.values(atoms2[i])+"<br>");
+}
+
+var frag_pos_z = [];
+
+mol[z] = atoms2;
+var frags = [];
+var bases = [];
+var orient = new Atom();
+for (var i=0; i < atoms2.length; i++){
+frag_pos_z.push(atoms2[i].z+vanDerWaalsRadius[atoms2[i].elem]);
+frag_pos_z.push(atoms2[i].z-vanDerWaalsRadius[atoms2[i].elem]);
+    if (atoms2[i].alt == 3){
+  orient.elem = "X1";
+  orient.x = atoms2[i].x;
+  orient.y = atoms2[i].y;
+  orient.z = atoms2[i].z;
+    };
+    if (atoms2[i].f == 1){
+  frags.push(atoms2[i]);
+    } else {
+  bases.push(atoms2[i]);
+    }
+}
+
+var l0 = Math.max(...frag_pos_z);
+var newPointEnd0 = new Atom({elem: "X", x: 0, y: 0, z: l0, w:0, f: 0});
+
+var bond = [];
+for (var i=0; i < frags.length; i++) {
+bond[i] = [];
+for (var k=0; k < frags.length; k++) {
+if (i != k) {
+var dist = frags[i].Distance(frags[k]);
+var cov = frags[i].CovBond(frags[k]);
+if (val1*cov <= dist && dist <= val2*cov){
+bond[i].push(k);
+}
+}
+}
+frags[i].bonds = bond[i];
+}
+
+var bond = [];
+for (var i=0; i < bases.length; i++) {
+bond[i] = [];
+for (var k=0; k < bases.length; k++) {
+if (i != k) {
+var dist = bases[i].Distance(bases[k]);
+var cov = bases[i].CovBond(bases[k]);
+if (val1*cov <= dist && dist <= val2*cov){
+bond[i].push(k);
+}
+}
+}
+bases[i].bonds = bond[i];
+}
+
+mol_frag[z]=frags;
+mol_base[z]=bases;
+
+var distance_target2fragment=[];
+for (var i=0; i < atoms2.length; i++){
+if (atoms2[i].f == 1){
+distance_target2fragment.push(atoms2[i].Distance(orient));
+}
+}
+var min_distance_target2fragment=Math.min(...distance_target2fragment).toFixed(3);
+mol_dist_targ2frag[z]=min_distance_target2fragment;
+
+var atoms3 = [];
+for (var i=0; i < atoms1.length; i++){
+    atoms3[i] = new Atom(atoms2[i]);
+if (atoms3[i].f == 0){
+    atoms3[i].elem = "X";
+}
+if (atoms3[i].f == 1){
+    atoms3[i].z = l1;
+}
+if (atoms3[i].alt == 3){
+    atoms3[i].elem = "X1";
+}
+}
+
+var distsize = [];
+var distvecfrag = [];
+for (var i=0; i<atoms3.length; i++){
+    if (atoms3[i].f == 1){
+    if (atoms3[i].alt == 2){
+  var newPointStart1=atoms2[i];
+    for (var k=0; k<atoms3.length; k++){
+  if (atoms3[k].f == 1){
+var dista1 = new Atom(atoms3[i]);
+dista1.z=0;
+var dista2 = new Atom(atoms3[k]);
+dista2.z=0;
+dista1.plus1(dista2);
+var scale1=dista1.size()+vanDerWaalsRadius[atoms3[k].elem];
+distsize.push(scale1);
+dista1.normalize();
+dista1.scale(scale1);
+dista1.z = l1;
+distvecfrag.push(dista1);
+  }
+    }    
+    }
+    }
+}
+
+var b5val = Math.max(...distsize);
+var b1val = Math.min(...distsize);
+
+var check4b1 = 0
+
+while (check4b1 < 1){
+
+var check100 = 359;
+//console.log(b1val);
+var check_b1 = b1val+0.001;
+var checkPoint = [];
+for (i=0; i<check100; i++){
+var angle = (i/360)*Math.PI*2;
+var xpoint = Math.cos(angle)*check_b1;
+var ypoint = Math.sin(angle)*check_b1;
+checkPoint[i] = new Atom({elem:'X',x:xpoint,y:ypoint,z:0,w:0,f:1,alt:0});
+}
+
+for (i=0; i<checkPoint.length; i++){
+for (j=0; j<atoms3.length; j++){
+    if(atoms3[j].f == 1){
+var dista3 = checkPoint[i].Distance(atoms3[j]);
+if (dista3 < vanDerWaalsRadius[atoms3[j].elem]){
+    checkPoint[i].alt=1;
+}
+}
+}
+}
+
+var preklopPoint = [];
+for (i=0; i<checkPoint.length; i++){
+if(checkPoint[i].alt == 1){
+    preklopPoint.push(checkPoint[i]);
+    preklopPoint[preklopPoint.length-1].z = l1;
+}
+}
+
+if (preklopPoint.length > 160){
+distsize[distsize.indexOf(b1val)] = +Infinity;
+b1val = Math.min(...distsize);
+} else {
+check4b1=1
+}
+
+}
+
+var b1 = new Atom(distvecfrag[distsize.indexOf(b1val)]);
+var b5 = new Atom(distvecfrag[distsize.indexOf(b5val)]);
+
+for (i=0; i<atoms2.length; i++){
+if (atoms2[i].alt == 3){
+var pointTarget = atoms2[i];
+}
+}for (i=0; i<atoms2.length; i++){
+if (atoms2[i].alt == 3){
+var pointTarget = atoms2[i];
+}
+}
+
+var radiusBur = 3.5;
+var voxelSize = 0.1;
+var nopoint = Math.floor(2*radiusBur/voxelSize);
+var voxel = [];
+for (q=0; q<nopoint; q++){
+    for(w=0; w<nopoint; w++){
+        for (e=0; e<nopoint; e++){
+voxel.push(new Atom({elem: "X", x: pointTarget.x-radiusBur+q*voxelSize, y: pointTarget.y-radiusBur+w*voxelSize, z: pointTarget.z-radiusBur+e*voxelSize}));
+        }
+    }
+}
+
+for (var q=voxel.length-1; q > -1; q--){
+var dist1 = voxel[q].Distance(pointTarget);
+if (dist1 > radiusBur){
+voxel.splice(q,1);
+} 
+}
+var voxstart = voxel.length;
+
+var newVoxel = voxel;
+var occVoxel = [];
+for (i=0; i<atoms2.length; i++){
+if (atoms2[i].alt != 3){
+    var dist2 = atoms2[i].Distance(pointTarget)-bondiScaledRadius[atoms2[i].elem];
+    if (dist2 < radiusBur){
+        for (var q=newVoxel.length-1; q > -1; q--){
+            var dist3 = atoms2[i].Distance(newVoxel[q]);
+            if (dist3 < bondiScaledRadius[atoms2[i].elem]){
+                occVoxel.push(newVoxel.splice(q,1));
+            }    
+        }
+    }
+}
+}
+
+var voxend = newVoxel.length;
+var voxdiff = occVoxel.length;
+var vbur = ((voxdiff/voxstart)*100).toFixed(2);
+
+
+mol_l0.push(l0);
+mol_b1.push(b1val);
+mol_b5.push(b5val);
+mol_vbur.push(vbur);
+
+demo3 += (z+" "+mol_energies_ratio_norm[z].toFixed(6)+" "+l0.toFixed(3)+" <FONT COLOR=blue>"+b1val.toFixed(3)+" <FONT COLOR=green>"+b5val.toFixed(3)+"<FONT COLOR=black><br>");
+demo61 += (z+" "+mol_energies_ratio_norm[z].toFixed(6)+" <FONT COLOR=red>"+vbur+"<FONT COLOR=black><br>")
+
+mol_l0_vect.push(new Atom({x:0.0,y:0.0,z:l0,elem:"X"}));
+mol_b5_vect.push(b5);
+mol_b1_vect.push(b1);
+
+mol_l0_norm_all += mol_l0[z]*mol_energies_ratio_norm[z];
+mol_b1_norm_all += mol_b1[z]*mol_energies_ratio_norm[z];
+mol_b5_norm_all += mol_b5[z]*mol_energies_ratio_norm[z];
+mol_vbur_norm_all += mol_vbur[z]*mol_energies_ratio_norm[z];
+mol_dist_targ2frag_norm_all += mol_dist_targ2frag[z]*mol_energies_ratio_norm[z];
+
+}
+
+
+
+var mol_l0_min = Math.min(...mol_l0);
+var mol_b1_min = Math.min(...mol_b1);
+var mol_b5_min = Math.min(...mol_b5);
+var mol_dist_targ2frag_min = Math.min(...mol_dist_targ2frag);
+var mol_l0_max = Math.max(...mol_l0);
+var mol_b1_max = Math.max(...mol_b1);
+var mol_b5_max = Math.max(...mol_b5);
+var mol_dist_targ2frag_max = Math.max(...mol_dist_targ2frag);
+var l0_min_mol = mol_l0.indexOf(mol_l0_min); 
+var b1_min_mol = mol_b1.indexOf(mol_b1_min); 
+var b5_min_mol = mol_b5.indexOf(mol_b5_min);
+var dist_targ2frag_min_mol = mol_dist_targ2frag.indexOf(mol_dist_targ2frag_min);
+var l0_max_mol = mol_l0.indexOf(mol_l0_max); 
+var b1_max_mol = mol_b1.indexOf(mol_b1_max); 
+var b5_max_mol = mol_b5.indexOf(mol_b5_max);
+var dist_targ2frag_max_mol = mol_dist_targ2frag.indexOf(mol_dist_targ2frag_max);
+
+var b5_2norm = [];
+for (i=0; i<mol_b5_vect.length; i++){
+b5_2norm.push(mol_b5_vect[i].size() - mol_b5_norm_all);
+}
+var b5_2norm_min=Math.min(...b5_2norm);
+var b5_2norm_pos=b5_2norm.indexOf(b5_2norm_min);
+
+var b1_2norm = [];
+for (i=0; i<mol_b1_vect.length; i++){
+b1_2norm.push(mol_b1_vect[i].size() - mol_b1_norm_all);
+}
+var b1_2norm_min=Math.min(...b1_2norm);
+var b1_2norm_pos=b1_2norm.indexOf(b1_2norm_min);
+
+var l0_2norm = [];
+for (i=0; i<mol_l0_vect.length; i++){
+l0_2norm.push(mol_l0_vect[i].size() - mol_l0_norm_all);
+}
+var l0_2norm_min=Math.min(...l0_2norm);
+var l0_2norm_pos=l0_2norm.indexOf(l0_2norm_min);
+
+demo2 +=("Range <strong>L<sub>0</sub></strong> MIN: "+mol_l0_min.toFixed(3)+" MAX: "+mol_l0_max.toFixed(3)+"<br>");
+demo2 +=("Range <strong><FONT COLOR = blue>B<sub>1</sub></strong> <FONT COLOR = black>MIN: <FONT COLOR = blue>"+mol_b1_min.toFixed(3)+" <FONT COLOR = black>MAX: <FONT COLOR = blue>"+mol_b1_max.toFixed(3)+"<br><FONT COLOR = black>");
+demo2 +=("Range <strong><FONT COLOR = green>B<sub>5</sub></strong> <FONT COLOR = black>MIN: <FONT COLOR = green>"+mol_b5_min.toFixed(3)+" <FONT COLOR = black>MAX: <FONT COLOR = green>"+mol_b5_max.toFixed(3)+"<br><FONT COLOR = black>");
+demo2 +=("<br>");
+demo2 +=("Normalized <strong>L<sub>0</sub></strong>: "+mol_l0_norm_all.toFixed(3)+"<br>");
+demo2 +=("Normalized <strong><FONT COLOR = blue>B<sub>1</sub></strong>: "+mol_b1_norm_all.toFixed(3)+"<br><FONT COLOR = black>");
+demo2 +=("Normalized <strong><FONT COLOR = green>B<sub>5</sub></strong>: "+mol_b5_norm_all.toFixed(3)+"<br><FONT COLOR = black>");
+demo2 +=("<br>");
+demo2 +=("Range minimal distance target to fragment MIN: "+mol_dist_targ2frag_min.toFixed(3)+" MAX: "+mol_dist_targ2frag_max.toFixed(3)+"<br>");
+demo2 +=("Normalized minimal distance target to fragment: "+mol_dist_targ2frag_norm_all.toFixed(3)+"<br>");
+demo6 +=(mol_vbur_norm_all.toFixed(2)+"% <br><FONT COLOR = black>");
+demo6 += demo61;
+
+
+
+$(function() {
+  let element = $('#container-04');
+  let config = { backgroundColor: '#fbfbfb' };
+  let viewer = $3Dmol.createViewer( element, config );
+var m = viewer.addModel();
+m.addAtoms(mol_base[0]);
+for(i=0;i<mol_frag.length;i++){
+    m.addAtoms(mol_frag[i]);
+}
+m.setStyle({},{sphere:{scale:0.3,opacity:0.4},stick:{radius:0.2,opacity:1}});
+viewer.addCylinder({start:{x:newPointStart.x,y:newPointStart.y,z:newPointStart.z+l1-0.2},
+    end:{x:newPointStart.x,y:newPointStart.y,z:newPointStart.z+l1+0.2},
+    radius:mol_b1_vect[b1_2norm_pos].size(),
+    color:'blue',
+    opacity:0.8
+   });
+viewer.addCylinder({start:{x:newPointStart.x,y:newPointStart.y,z:newPointStart.z+l1-0.2},
+    end:{x:newPointStart.x,y:newPointStart.y,z:newPointStart.z+l1+0.2},
+    radius:mol_b5_vect[b5_2norm_pos].size(),
+    color:'green',
+    opacity:0.8
+   });
+viewer.addArrow({start:newPointStart,end:newPointEnd0,radius:0.1});
+viewer.addArrow({start:newPointStart1,end:mol_b1_vect[b1_2norm_pos],radius:0.1, color:"blue"});
+viewer.addArrow({start:newPointStart1,end:mol_b5_vect[b5_2norm_pos],radius:0.1, color:"green"});
+viewer.addStyle({elem:'X'},{sphere:{scale:0.2,color:"#ffff00"}});
+viewer.zoomTo();
+viewer.render();
+});
+
+//console.log(mol_l0);
+//console.log(mol_b1);
+//console.log(mol_b5);
+
+document.getElementById('demo2').innerHTML = demo2 ;
+document.getElementById('demo3').innerHTML = demo3 ;
+document.getElementById('demo6').innerHTML = demo6 ;
+}
+
+
+
+
+
+
+</script>
+
+
+</body>
+
+  <div class="footer">
+<br><br><hr><br>
+   &copy; 2021.-2022. <a href="http://sw.pharma.hr/light-n-ring" target="_blank">LIGHT-N-RING.</a> All rights reserved.&nbsp;&nbsp;&nbsp;&nbsp;<br>
+    Contact: <a href="mailto:dsakic@pharma.hr?subject=LIGHT-N-RING" target="_blank" rel="noopener noreferrer">Davor Šakić</a>&nbsp;&nbsp;&nbsp;&nbsp;<br />
+
+  </div>
+
+</html>
