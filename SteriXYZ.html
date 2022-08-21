@@ -215,7 +215,7 @@ background-color: rgba(55, 93, 157, 0.1);
   This is a web-based implementation for calculation of <strong>Sterimol</strong> parameters for organic molecules, developed by Tipker and Verloop (<i>Pesticide Synthesis Through Rational Approaches</i>,<strong> 1984</strong>, Chapter 16, pp 279-296, DOI: <a href="https://doi.org/10.1021/bk-1984-0255.ch016" target="_blank">10.1021/bk-1984-0255.ch016</a>). Web version was inspired by wSterimol, Sterimol and DBSTEP command-line python programs developed by Brethomé and Paton (<i>ACS Catal.</i>,<strong> 2019</strong>, 9(3), pp 2313–2323, DOI: <a href="https://doi.org/10.1021/acscatal.8b04043" target="_blank">10.1021/acscatal.8b04043</a>, <a href="https://github.com/bobbypaton/wSterimol/" target="_blank">GitHub</a>, <a href="https://zenodo.org/record/1434440#.Yr4kHy8RqLc" target="_blank">Zenodo DOI:10.5281/zenodo.1434440</a>), and Luchini, Patterson, and Paton (<a href="https://zenodo.org/record/4702098#.Yr4kPy8RqLc" target="_blank">Zenodo DOI:10.5281/zenodo.4702097</a>). 
   The main difference is the usage of xyz coordinates (in .xyz), calculation on a complete system, no requirement for installation procedure, and direct visualization of Sterimol sub-parameters (<strong>L<sub>0</sub></strong>, <a style="color:blue;"><strong>B<sub>1</sub></strong></a>, and <a style="color:green;"><strong>B<sub>5</sub></strong></a>).<br>
   Additionally, burried volume (<a style="color:red;"><strong>%V<sub>Bur</sub></strong></a>) is calculated using similar aproach as <a href="https://www.molnac.unisa.it/OMtools/sambvca2.1/info/info.html" target="_blank">SambVca 2.1</a>, developed by Cavallo <i>et al</i> (<i>Nature Chem.</i>, <strong>2019</strong>, 11, pp. 872–879, DOI:<a href="https://doi.org/10.1038/s41557-019-0319-5" target="_blank">10.1038/s41557-019-0319-5</a>). For calculation of buried volume only definition of reaction centre is needed (see Input section). Ignoring reaction centre radius, target radius of 3.5 ångströms, mesh spacing value of 0.1 ångströms, and Bondi atomic radii scaled by 1.17 are used for the calculation.<br>
-  <h3> INPUT </h3>For input, a modified XYZ file is needed. XYZ format specifies the molecule geometry by giving the number of atoms with Cartesian coordinates that will be read on the first line, a comment on the second (usually name and/or energy), and the lines of atomic coordinates in the following lines. The units are in ångströms. After definition of atom type, x, y, and z coordinates, additional column <strong>Frag</strong> is used for assignation of fragments (0 for fixed, 1 for variable part (-R)), while column <strong>Atrib</strong> assigns atoms for primary bond of Sterimol (<strong>L<sub>0</sub></strong> parameter (1 and 2)) and target reaction centre (3). For analysis of multiple conformations, previously generated .xyz and .trj (from xtb and ORCA programs), with the <strong>same</strong> ordering of atoms as in input coordinates should be selected in the drop-zone (choose file). Botzmann averaging is performed at 298.15 K.<br>Example file for multimolecule file can be found <a href="multi.trj.xyz">here</a>.<br> 
+  <h3> INPUT </h3>For input, a modified XYZ file is needed. XYZ format specifies the molecule geometry by giving the number of atoms with Cartesian coordinates that will be read on the first line, a comment on the second (usually name and/or energy), and the lines of atomic coordinates in the following lines. The units are in ångströms. After definition of atom type, x, y, and z coordinates, additional column <strong>Frag</strong> is used for assignation of fragments (0 for fixed, 1 for variable part (-R)), while column <strong>Atrib</strong> assigns atoms for primary bond of Sterimol (<strong>L<sub>0</sub></strong> parameter (1 and 2)) and target reaction centre (3) for SambVca <a style="color:red;"><strong>%V<sub>Bur</sub></strong></a>. For analysis of multiple conformations, previously generated .xyz and .trj (from xtb and ORCA programs), with the <strong>same</strong> ordering of atoms as in input coordinates should be selected in the drop-zone (choose file). Botzmann averaging is performed at 298.15 K.<br>Example file for multimolecule file can be found <a href="multi.trj.xyz">here</a>.<br> 
   <h3> CREDITS </h3> This software was developed by <a href="https://scholar.google.com/citations?hl=en&user=BBURjcwAAAAJ&view_op=list_works&sortby=pubdate" target="_blank">Davor Šakić</a> and Gabrijel Zubčić. Help from Valerije Vrček (discussion and testing) and Mateja Toma (testing) is greatly appreciated.<br>
   Funding: <a href="http://www.hrzz.hr" target="_blank">HrZZ</a>, <a href="http://orden.pharma.hr" target="_blank">OrDeN</a>, <a href="http://light-n-ring.pharma.hr" target="_blank">LIGHT-N-RING</a>, 2022.
   <br><br> 
@@ -1006,9 +1006,11 @@ coor1 = coor1.filter(Boolean);
 
 var mol_energies_min=Math.min(...mol_energies);
 var mol_energies_ratio_nonorm=[];
+var mol_energies_kj = [];
 var normale = 0;
 var temp=298.15;
 for (i=0;i<mol_energies.length;i++){
+    mol_energies_kj.push(((mol_energies[i])-(mol_energies_min))*627.509*4.184);
     mol_energies_ratio_nonorm[i]=Math.exp((mol_energies_min-mol_energies[i])*627.509*4.184*1000/(temp*8.314));
     normale += mol_energies_ratio_nonorm[i];
 }
@@ -1322,7 +1324,6 @@ var voxend = newVoxel.length;
 var voxdiff = occVoxel.length;
 var vbur = ((voxdiff/voxstart)*100).toFixed(2);
 
-
 mol_l0.push(l0);
 mol_b1.push(b1val);
 mol_b5.push(b5val);
@@ -1428,18 +1429,22 @@ viewer.zoomTo();
 viewer.render();
 });
 
-//console.log(mol_l0);
-//console.log(mol_b1);
-//console.log(mol_b5);
+var data = {
+    x: mol_vbur,
+    y: mol_energies_kj,
+    mode: 'markers',
+    type: 'scatter'
+};
+var layout = {
+xaxis: {title: "<a style=\"color:red;\">% V<sub>Bur</sub></a>"},
+yaxis: {title: "E<sub>rel</sub> (kJ/mol)"}
+};
+Plotly.newPlot('container-06', [data], layout);
 
 document.getElementById('demo2').innerHTML = demo2 ;
 document.getElementById('demo3').innerHTML = demo3 ;
 document.getElementById('demo6').innerHTML = demo6 ;
 }
-
-
-
-
 
 
 </script>
